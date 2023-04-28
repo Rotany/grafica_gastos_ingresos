@@ -15,5 +15,80 @@ datos_bancarios.columns =data_columnas
 datos_bancarios.drop(delete_columnas,axis=1, inplace=True)
 datos_bancarios.drop(delete_filas,axis=0,inplace=True)
 
+
+
+# Aplicar logica
+text_convertido={
+    "supermercado":["aldi", "dia","lidl","alcampo","comsum","carrefur","mercadona","splau","bon area"]
+}
+text_esperado=[
+"ALDI",
+"DIA",
+"ESPORTIU",
+"SERVICIO BASICO",
+"BIZUM",
+"VIVID MONEY",
+"MERCADONA",
+"ZALANDO", 
+"VUELING",
+"BAZAR", 
+"BAR RES",
+"VETERINARIA",
+"FARMACIA",
+"XOAMI",
+"GASOLINERA",
+"UDEMY",
+"AUTOMATICO",
+"ASSOCIATS",
+"COMISIONS",
+"JHON",
+"CONCEPCIÓN GUTIÉRREZ",
+"TELEPIZZA",
+"BON AREA",
+"FARMACIA",
+"ELECTRICITY",
+"CAPRABO",
+"VETERI",
+"SEU & GO",
+"EXP",
+"COTIZACION",
+"CAFETERIA",
+"CARNICERIA",
+"FRUTERIA",
+"CENTRE VETERINARI",
+"CA L'ARMENGOL",
+"UNIVERSIT",
+"BERSHKA",
+"BASAR",
+"BAR LA COTXERA",
+"BOIX",
+"BEN JHON",
+"CAFÉ GRILL",
+"CARREF",
+"ALIMENTACION",
+"COALIMENT",
+"DECATHLON",
+"GELATS",
+"GRAD",
+"E S VALENTI",
+"LIDL",
+"XIAOMI",
+"THE NORTH",
+"THE PHONEx",
+"TRANSFER TO CONCEPCION GUTIERREZ",
+"RYANAIR",
+"ROCKNROLLA",
+"DISSEU",
+"DOMINO",
+"GUISONA T347",
+"COMISSIONS",
+"CONSUM",
+"ALE HOP",
+"FIVERR",
+"HOSTINGER" ,
+"ARAP",
+"ALCAMPO"
+]
+
 # Mostrando resultados
 print (datos_bancarios.head(10))
