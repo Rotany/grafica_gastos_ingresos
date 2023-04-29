@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
 # Asignar variables
 data_columnas=["Operation date" , "Item","Value date","Amount","Balance","Reference1","Reference2"]
@@ -19,76 +20,63 @@ datos_bancarios.drop(delete_filas,axis=0,inplace=True)
 
 # Aplicar logica
 text_convertido={
-    "supermercado":["aldi", "dia","lidl","alcampo","comsum","carrefur","mercadona","splau","bon area"]
+    "supermercado":["aldi", "dia","lidl","alcampo","consum","carrefur","mercadona","splau","bon area","caprabo","seu & go","arap","coaliment","carniceria","disseu","fruteria","ca l'armengol", "boix","alimentacion",],
+    "restaurant":["telepizza","cafeteria","café grill","gelats", "ben jhon","bar la cotxera", "domino","grad","rocknrolla", "bar res","son soles"],
+    "gatos":["veterinaria","bazar","veteri","centre veterinari",],
+    "ropa":["zalando","bershka","the north","decathlon", "esportiu",],
+    "coche":["gasolinera","e s valenti","guisona t347",  ],
+    "servicio basico":["electricity","iberdrola", "libertad", "concepción gutiérrez","transfer to concepcion gutierrez", ],
+    "salud":["farmacia", ],
+    "viajes":["vueling","ryanair",],
+    "educacion":["udemy","universit","platzi"],
+    "autonomo": ["cotizacion","associats", ],
+    "varios":[ "bizum", "vivid money", "automatico", "jhon", "exp", ],
+    "tecnologia": ["ale hop","hostinger","fiverr","xoami","xiaomi","the phone", ]
 }
-text_esperado=[
-"ALDI",
-"DIA",
-"ESPORTIU",
-"SERVICIO BASICO",
-"BIZUM",
-"VIVID MONEY",
-"MERCADONA",
-"ZALANDO", 
-"VUELING",
-"BAZAR", 
-"BAR RES",
-"VETERINARIA",
-"FARMACIA",
-"XOAMI",
-"GASOLINERA",
-"UDEMY",
-"AUTOMATICO",
-"ASSOCIATS",
-"COMISIONS",
-"JHON",
-"CONCEPCIÓN GUTIÉRREZ",
-"TELEPIZZA",
-"BON AREA",
-"FARMACIA",
-"ELECTRICITY",
-"CAPRABO",
-"VETERI",
-"SEU & GO",
-"EXP",
-"COTIZACION",
-"CAFETERIA",
-"CARNICERIA",
-"FRUTERIA",
-"CENTRE VETERINARI",
-"CA L'ARMENGOL",
-"UNIVERSIT",
-"BERSHKA",
-"BASAR",
-"BAR LA COTXERA",
-"BOIX",
-"BEN JHON",
-"CAFÉ GRILL",
-"CARREF",
-"ALIMENTACION",
-"COALIMENT",
-"DECATHLON",
-"GELATS",
-"GRAD",
-"E S VALENTI",
-"LIDL",
-"XIAOMI",
-"THE NORTH",
-"THE PHONEx",
-"TRANSFER TO CONCEPCION GUTIERREZ",
-"RYANAIR",
-"ROCKNROLLA",
-"DISSEU",
-"DOMINO",
-"GUISONA T347",
-"COMISSIONS",
-"CONSUM",
-"ALE HOP",
-"FIVERR",
-"HOSTINGER" ,
-"ARAP",
-"ALCAMPO"
-]
+
+category_dict = {}
+for key in text_convertido.keys():
+    for value in text_convertido[key]:
+        category_dict[value] = key
+    
 
 # Mostrando resultados
-print (datos_bancarios.head(10))
+datos_bancarios["Item"] = datos_bancarios["Item"].apply(lambda elemento: elemento.lower())
+
+datos_bancarios["Category"] = datos_bancarios["Item"].apply(lambda x: next((category_dict[word] for word in x.lower().split() if word in category_dict), "Desconocido"))
+
+# Crear archivo "desconocido.csv" con filas con categorías desconocidas
+desconocido = datos_bancarios[datos_bancarios["Category"] == "Desconocido"]
+desconocido.to_csv("desconocido.csv", index=False)
+
+datos_bancarios['Year'] = datos_bancarios['Operation date'].apply(lambda x: x.split("/")[2])
+
+# crear dos dataframes
+gastos=datos_bancarios[datos_bancarios["Amount"]  <0  ]
+ingresos =datos_bancarios[datos_bancarios["Amount"]  >0 ]
+
+
+# pasando a positivo los valores de gastos
+gastos["Amount"] =- gastos["Amount"]
+
+
+# Obtener años únicos
+years = gastos["Year"].unique()
+
+# Graficar
+for year in years:
+    # Filtrar por año
+    data = gastos[gastos["Year"] == year]
+    # Agrupar por categoría y sumar los montos
+    grouped_data = data.groupby("Category")["Amount"].sum()
+    # Graficar
+    plt.bar(grouped_data.index, grouped_data.values, label=year, width=0.8)
+
+# Configurar gráfico
+plt.title("Gastos por categoría y año")
+plt.xlabel("Categoría")
+plt.ylabel("Gasto")
+plt.legend()
+
+# Mostrar gráfico
+plt.show()
