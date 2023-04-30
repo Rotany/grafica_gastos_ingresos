@@ -10,13 +10,11 @@ delete_filas= [0,1,2,3,4,5,6,7]
 datos_bancarios= pd.read_excel("datos_bancarios_Jhon.xls")
 
 # Asignando nombre de las columnas del excel
-datos_bancarios.columns =data_columnas
+datos_bancarios.columns = data_columnas
 
 # Eliminando columnas y filas
 datos_bancarios.drop(delete_columnas,axis=1, inplace=True)
 datos_bancarios.drop(delete_filas,axis=0,inplace=True)
-
-
 
 # Aplicar logica
 text_convertido={
@@ -37,18 +35,33 @@ text_convertido={
 category_dict = {}
 for key in text_convertido.keys():
     for value in text_convertido[key]:
-        category_dict[value] = key
-    
+        category_dict[value.lower()] = key
 
-# Mostrando resultados
+
+# Funcion para encontrar la categoria adecuada
+def find_category(item, category_dict):
+    item_lower = item.lower()
+    for keyword, category in category_dict.items():
+        if keyword in item_lower:
+            return category
+    return "Desconocido"
+
+
+# Pasando Item a minuscula y poniedo la categoria
 datos_bancarios["Item"] = datos_bancarios["Item"].apply(lambda elemento: elemento.lower())
 
-datos_bancarios["Category"] = datos_bancarios["Item"].apply(lambda x: next((category_dict[word] for word in x.lower().split() if word in category_dict), "Desconocido"))
+datos_bancarios["Category"] = datos_bancarios["Item"].apply(lambda x: find_category(x, category_dict))
+
+# Eliminar filas con categorías varias y montos mayores a 120
+datos_bancarios = datos_bancarios.loc[(datos_bancarios["Category"] != "varios") |
+                                      ((datos_bancarios["Category"] == "varios") &
+                                       (datos_bancarios["Amount"].abs() <= 120))]
 
 # Crear archivo "desconocido.csv" con filas con categorías desconocidas
 desconocido = datos_bancarios[datos_bancarios["Category"] == "Desconocido"]
 desconocido.to_csv("desconocido.csv", index=False)
 
+# Crear columna de año
 datos_bancarios['Year'] = datos_bancarios['Operation date'].apply(lambda x: x.split("/")[2])
 
 # crear dos dataframes
@@ -56,7 +69,7 @@ gastos=datos_bancarios[datos_bancarios["Amount"]  <0  ]
 ingresos =datos_bancarios[datos_bancarios["Amount"]  >0 ]
 
 
-# pasando a positivo los valores de gastos
+# Pasando a positivo los valores de gastos
 gastos["Amount"] =- gastos["Amount"]
 
 
@@ -77,6 +90,8 @@ plt.title("Gastos por categoría y año")
 plt.xlabel("Categoría")
 plt.ylabel("Gasto")
 plt.legend()
+# Rotar etiquetas del eje x para que se puedan ver todas
+plt.xticks(rotation=45, ha='right')
 
 # Mostrar gráfico
 plt.show()
