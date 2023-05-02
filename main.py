@@ -89,9 +89,4 @@ for year in years:
 plt.title("Gastos por categoría y año")
 plt.xlabel("Categoría")
 plt.ylabel("Gasto")
-plt.legend()
-# Rotar etiquetas del eje x para que se puedan ver todas
-plt.xticks(rotation=45, ha='right')
-
-# Mostrar gráfico
-plt.show()
+plt.lege
